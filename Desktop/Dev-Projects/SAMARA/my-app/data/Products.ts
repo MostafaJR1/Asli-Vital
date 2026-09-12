@@ -46,4 +46,35 @@ export const ProductsData = [
         ],
         "shipping": "شحن مجاني"
     },
+
+    {
+        "id": "product-002",
+        "name": "كرسي مبطن عصري",
+        "category": "الأثاث",
+        "image": "https://res.cloudinary.com/dipa1pgem/image/upload/v1789217559/fdf2kwqemswn4itmzba1.png",
+        "price": 499,
+        "oldPrice": 649,
+        "discount": 23,
+        "rating": 4.7,
+        // "reviews": 86,
+        "badge": "جديد",
+        "description": "كرسي جلوس مريح بتصميم عصري، مزود بمقعد مبطن باللون الأحمر وقاعدة معدنية متينة بتصميم منحني.",
+        "colors": [
+            {
+                "id": "red",
+                "name": "أحمر",
+                "hex": "#c93632",
+                "image": "https://res.cloudinary.com/dipa1pgem/image/upload/v1789217559/fdf2kwqemswn4itmzba1.png"
+            }
+        ],
+        "stock": 8,
+        "features": [
+            "مقعد مبطن ومريح",
+            "قاعدة معدنية متينة",
+            "تصميم عصري وأنيق",
+            "مناسب لغرفة المعيشة أو المكتب",
+            "سهل التنظيف"
+        ],
+        "shipping": "شحن مجاني"
+    }
 ];

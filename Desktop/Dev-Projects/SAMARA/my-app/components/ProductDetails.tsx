@@ -12,18 +12,54 @@ import {
   FiTruck,
   FiShield,
   FiChevronLeft,
+  FiArrowLeft,
 } from "react-icons/fi";
 import type { ProductsData } from "@/data/Products";
 
 type Product = (typeof ProductsData)[number];
 
-export function ProductDetails({ product }: { product: Product }) {
+function getRecommendedProducts(product: Product, products: Product[]) {
+  return products
+    .filter((candidate) => candidate.id !== product.id)
+    .map((candidate) => {
+      const sharedFeatures = candidate.features.filter((feature) =>
+        product.features.includes(feature)
+      ).length;
+      const sharedColors = candidate.colors.filter((color) =>
+        product.colors.some((productColor) => productColor.id === color.id)
+      ).length;
+      const sameCategory = candidate.category === product.category;
+      const priceDistance = Math.abs(candidate.price - product.price) / product.price;
+
+      const score =
+        (sameCategory ? 40 : 0) +
+        sharedFeatures * 12 +
+        sharedColors * 4 +
+        candidate.rating * 3 +
+        candidate.discount * 0.25 -
+        priceDistance * 10;
+
+      return { candidate, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(({ candidate }) => candidate);
+}
+
+export function ProductDetails({
+  product,
+  products,
+}: {
+  product: Product;
+  products: Product[];
+}) {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [added, setAdded] = useState(false);
 
   const total = product.price * quantity;
   const saving = product.oldPrice - product.price;
+  const recommendedProducts = getRecommendedProducts(product, products);
 
   function addToCart() {
     setAdded(true);
@@ -409,6 +445,67 @@ export function ProductDetails({ product }: { product: Product }) {
             </div>
           </section>
         </div>
+
+        {recommendedProducts.length > 0 && (
+          <section className="mt-20 border-t border-neutral-200 pt-10 lg:mt-28" aria-labelledby="recommended-products">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
+                  مختارات لك
+                </p>
+                <h2 id="recommended-products" className="text-xl font-black tracking-tight text-neutral-950 sm:text-2xl">
+                  قد يعجبك أيضًا
+                </h2>
+                <p className="mt-2 text-xs text-neutral-500">
+                  اختيارات مبنية على ذوقك وتفاصيل هذا المنتج
+                </p>
+              </div>
+
+              <Link href="/products" className="hidden items-center gap-2 text-xs font-bold text-neutral-900 transition-colors hover:text-neutral-500 sm:flex">
+                عرض الكل
+                <FiArrowLeft className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {recommendedProducts.map((recommendedProduct) => (
+                <Link
+                  key={recommendedProduct.id}
+                  href={`/products/${recommendedProduct.id}`}
+                  className="group block cursor-pointer space-y-3 rounded-lg border border-neutral-200/80 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-100">
+                    <Image
+                      src={recommendedProduct.image}
+                      alt={recommendedProduct.name}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                    <span className="absolute right-2 top-2 rounded-md bg-neutral-900 px-2 py-0.5 text-[9px] font-bold text-white">
+                      {recommendedProduct.badge}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 px-1 text-right">
+                    <h3 className="truncate text-xs font-bold text-neutral-900 group-hover:underline">
+                      {recommendedProduct.name}
+                    </h3>
+                    <div className="flex items-center justify-between text-[11px] text-neutral-500">
+                      <span className="font-bold text-neutral-900">
+                        {recommendedProduct.price.toLocaleString("ar-MA")} د.م
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FiStar className="h-3 w-3 fill-neutral-900 text-neutral-900" />
+                        {recommendedProduct.rating}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* =====================================================
             MOBILE STICKY CART

@@ -18,7 +18,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-white text-neutral-900">
       <Header />
-      <ProductDetails product={product} />
+      <ProductDetails product={product} products={ProductsData} />
     </div>
   );
 }
